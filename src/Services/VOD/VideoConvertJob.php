@@ -8,7 +8,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Larapress\FileShare\Models\FileUpload;
-use Larapress\Reports\Services\ITaskReportService;
+use Larapress\Reports\Services\TaskScheduler\ITaskSchedulerService;
 
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 use FFMpeg\Format\Video\X264;

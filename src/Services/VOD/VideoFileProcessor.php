@@ -6,8 +6,7 @@ use Illuminate\Http\Request;
 use Larapress\FileShare\Models\FileUpload;
 use Larapress\FileShare\Services\FileUpload\IFileUploadProcessor;
 use Larapress\Reports\Models\TaskReport;
-use Larapress\Reports\Services\ITaskHandler;
-use Larapress\Reports\Services\ITaskReportService;
+use Larapress\Reports\Services\TaskScheduler\ITaskHandler;
 
 class VideoFileProcessor implements IFileUploadProcessor, ITaskHandler
 {
