@@ -7,6 +7,7 @@ return [
     ],
 
     'queue' => 'jobs',
+
     'hls_variants' => [
         264 => [426, 240],
         878 => [640, 360],

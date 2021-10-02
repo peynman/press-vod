@@ -4,27 +4,60 @@ namespace Larapress\VOD\Services\VOD;
 
 use Illuminate\Http\Request;
 use Larapress\FileShare\Models\FileUpload;
-use Larapress\FileShare\Services\FileUpload\IFileUploadProcessor;
+use Larapress\FileShare\Services\FileUpload\ScheduledFileProcessor;
 use Larapress\Reports\Models\TaskReport;
 use Larapress\Reports\Services\TaskScheduler\ITaskHandler;
 
-class VideoFileProcessor implements IFileUploadProcessor, ITaskHandler
+class VideoFileProcessor extends ScheduledFileProcessor implements ITaskHandler
 {
     /**
      * Undocumented function
      *
+     * @param Request $request
      * @param FileUpload $upload
-     * @return FileUpload
+     * @return string
      */
-    public function postProcessFile(Request $request, FileUpload $upload)
+    public function getTaskClass(Request $request, FileUpload $upload): string
     {
-        /** @var ITaskReportService */
-        $taskService = app(ITaskReportService::class);
-        $autoStart = $request->get('auto_start', false);
-        if ($autoStart) {
-            $autoStart = $request->get('start_at', true);
-        }
-        $taskService->scheduleTask(self::class, 'convert-'.$upload->id, 'Queued Convert.', ['id' => $upload->id], $autoStart);
+        return self::class;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param Request $request
+     * @param FileUpload $upload
+     * @return string
+     */
+    public function getTaskName(Request $request, FileUpload $upload): string
+    {
+        return 'convert-' . $upload->id;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param Request $request
+     * @param FileUpload $upload
+     * @return string
+     */
+    public function getTaskDescription(Request $request, FileUpload $upload): string
+    {
+        return trans('larapress::vod.convert_task', [
+            'id' => $upload->id,
+        ]);
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param Request $request
+     * @param FileUpload $upload
+     * @return array
+     */
+    public function getTaskData(Request $request, FileUpload $upload): array
+    {
+        return [];
     }
 
     /**
@@ -46,7 +79,6 @@ class VideoFileProcessor implements IFileUploadProcessor, ITaskHandler
      */
     public function handle(TaskReport $task)
     {
-        $upload = FileUpload::find($task->data['id']);
-        VideoConvertJob::dispatch($upload);
+        VideoConvertJob::dispatch($task->data['id']);
     }
 }

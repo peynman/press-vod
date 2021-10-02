@@ -21,16 +21,18 @@ class VideoConvertJob implements ShouldQueue
     /**
      * @var FileUpload
      */
+    private $uploadId;
     private $upload;
 
     /**
      * Create a new job instance.
      *
-     * @param FileUpload $message
+     * @param int $message
      */
-    public function __construct(FileUpload $upload)
+    public function __construct(int $uploadId)
     {
-        $this->upload = $upload;
+        $this->uploadId = $uploadId;
+        $this->upload = FileUpload::find($uploadId);
         $this->onQueue(config('larapress.vod.queue'));
     }
 
@@ -45,14 +47,14 @@ class VideoConvertJob implements ShouldQueue
      */
     public function handle()
     {
-        /** @var ITaskReportService */
-        $taskService = app(ITaskReportService::class);
+        /** @var ITaskSchedulerService */
+        $taskService = app(ITaskSchedulerService::class);
 
         $taskData = ['id' => $this->upload->id];
         $taskService->startSyncronizedTaskReport(
             VideoFileProcessor::class,
             'convert-' . $this->upload->id,
-            'Started...',
+            trans('larapress::vod.convert_started'),
             $taskData,
             function ($onUpdate, $onSuccess, $onFailed) use ($taskData) {
                 try {
@@ -75,7 +77,7 @@ class VideoConvertJob implements ShouldQueue
                         });
                     }
                     $mediaHLSExport->onProgress(function ($percent) use ($onUpdate, $taskData) {
-                        $onUpdate('Converting %'.$percent.'...', $taskData);
+                        $onUpdate(trans('larapress::vod.convert_updated', ['percent' => $percent]), $taskData);
                     });
                     $mediaHLSExport->setSegmentLength(10);
 
@@ -83,7 +85,7 @@ class VideoConvertJob implements ShouldQueue
                     Storage::disk($this->upload->storage)->makeDirectory($dir);
                     $mediaHLSExport->save($dir . '/vod.m3u8');
                     $took = time() - $startTime;
-                    $onSuccess('Finished, took '.$took.' sec.', $taskData);
+                    $onSuccess(trans('larapress::vod.convert_finished', ['sec' => $took]), $taskData);
                 } catch (\Exception $e) {
                     $onFailed('Error: '.$e->getMessage(), $taskData);
                 }

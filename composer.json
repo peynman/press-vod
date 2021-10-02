@@ -10,18 +10,18 @@
     }],
     "autoload": {
         "psr-4": {
-            "Larapress\\LiveStream\\": "src/"
+            "Larapress\\VOD\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Larapress\\LiveStream\\Tests\\": "tests/"
+            "Larapress\\VOD\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Larapress\\LiveStream\\Providers\\PackageServiceProvider"
+                "Larapress\\VOD\\Providers\\PackageServiceProvider"
             ]
         }
     },
